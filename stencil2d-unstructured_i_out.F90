@@ -1,7 +1,7 @@
 ! ******************************************************
 !     Program: stencil2d
 !      Author: Oliver Fuhrer
-!       Email: oliverf@vulcan.com
+!       Email: oliverf@vulcan.com; modified by group10
 !        Date: 20.05.2020
 ! Description: Simple stencil example (4th-order diffusion)
 ! ******************************************************
