@@ -29,7 +29,8 @@ module m_utils
 
     interface write_field_to_file
         module procedure write_2d_float32_field_to_file, write_3d_float32_field_to_file, &
-                         write_2d_float64_field_to_file, write_3d_float64_field_to_file
+                         write_2d_float64_field_to_file, write_3d_float64_field_to_file, &
+                         write_unstructured_float32_field_to_file, write_unstructured_float64_field_to_file
     end interface write_field_to_file
     
 contains
@@ -117,6 +118,44 @@ contains
         close(iunit)
 
     end subroutine write_3d_float64_field_to_file
+    
+    subroutine write_unstructured_float32_field_to_file( field, filename )
+        implicit none
+
+        ! arguments
+        real (kind=4), intent(in) :: field(:, :, :)
+        character(len=*), intent(in) :: filename
+
+        ! local
+        integer :: iunit = 42
+        integer :: i, j, k
+
+        open(iunit, file=trim(filename), access="stream")
+        write(iunit) 3, 32
+        write(iunit) shape(field)
+        write(iunit) field
+        close(iunit)
+
+    end subroutine write_unstructured_float32_field_to_file
+    
+    subroutine write_unstructured_float64_field_to_file( field, filename )
+        implicit none
+
+        ! arguments
+        real (kind=8), intent(in) :: field(:, :, :)
+        character(len=*), intent(in) :: filename
+
+        ! local
+        integer :: iunit = 42
+        integer :: i, j, k
+
+        open(iunit, file=trim(filename), access="stream")
+        write(iunit) 3, 64
+        write(iunit) shape(field)
+        write(iunit) field
+        close(iunit)
+
+    end subroutine write_unstructured_float64_field_to_file
     
 
     function is_master()
