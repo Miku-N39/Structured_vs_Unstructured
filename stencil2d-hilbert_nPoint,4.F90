@@ -1,5 +1,5 @@
 ! ******************************************************
-!     Program: stencil2d
+!     Program: stencil2d-hilbert_nPoint,4
 !      Author: Oliver Fuhrer; modified by group10
 !       Email: oliverf@vulcan.com
 !        Date: 20.05.2020
