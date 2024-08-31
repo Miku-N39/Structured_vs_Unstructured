@@ -1,4 +1,4 @@
-# HPC4WC Group10 Structured vs. Unstructured
+# HPC4WC Group10 Unstructured vs. Structured grids
 
 The root repository contains the Fortran files (for different versions of the stencil2d program) and the jupyter notebook files (for validating and plotting experiment results). The data and figures folders contain the raw data of different experiments and the figures on the report respectively. 
 
