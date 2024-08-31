@@ -1,6 +1,6 @@
 ! ******************************************************
-!     Program: stencil2d-hilbert_nPoint,4
-!      Author: Oliver Fuhrer; modified by group10
+!     Program: stencil2d
+!      Author: Oliver Fuhrer
 !       Email: oliverf@vulcan.com
 !        Date: 20.05.2020
 ! Description: Simple stencil example (4th-order diffusion)
@@ -243,43 +243,50 @@ contains
     end subroutine inverse_mapping
 
     ! find the grid point of the 4 neighbors of each grid index
-    subroutine find_neighbors(neighbors, gridindex)
+   subroutine find_neighbors(neighbors, gridindex)
         implicit none
 
-        integer, allocatable, intent(inout) :: neighbors(:,:) 
+        integer, allocatable, intent(inout) :: neighbors(:,:)
         integer, intent(in) :: gridindex(:,:)
         integer :: xcoord, ycoord
         integer :: top, btm, left, right
         integer :: n ! loop indices
-                
-        ! (4,nPoint); 4 dims of neighbors (top, btm, left, right)
-        if ( allocated(neighbors) .and. &
-            any( shape(neighbors) /= (/4, nPoint/) ) ) then
-            deallocate( neighbors )
-        end if
-        if ( .not. allocated(neighbors) ) then
-            allocate( neighbors(4, nPoint) )
-            neighbors = 0
-        end if
-        
-        xcoord = 0; ycoord = 0
+
+        ! (nPoint, 4); 4 dimensions of neighbors (top, btm, left, right)
+        allocate(neighbors(nPoint, 4))
+        neighbors = 0
 
         do n = 1, nPoint
             ! coordinates of the current grid
             xcoord = xPoint(n)
             ycoord = yPoint(n)
-            top = MODULO(ycoord, ny) + 1; btm = MODULO(ycoord - 2, ny) + 1
-            left = MODULO(xcoord - 2, nx) + 1; right = MODULO(xcoord, nx) + 1
-            
+            top = MODULO(ycoord, ny) + 1
+            btm = MODULO(ycoord - 2, ny) + 1
+            left = MODULO(xcoord - 2, nx) + 1
+            right = MODULO(xcoord, nx) + 1
+
+            ! Ensure indices are within bounds
+            if (top < 1) top = ny
+            if (btm < 1) btm = ny
+            if (left < 1) left = nx
+            if (right < 1) right = nx
+
+            if (xcoord < 1 .or. xcoord > nx .or. ycoord < 1 .or. ycoord > ny) then
+                print *, 'Error in neighbors: xcoord, ycoord = ', xcoord, ycoord
+                stop
+            endif
+
             ! Assign neighbors
-            neighbors(1, n) = gridindex(xcoord, top)    ! top neighbor
-            neighbors(2, n) = gridindex(xcoord, btm)    ! bottom neighbor
-            neighbors(3, n) = gridindex(left, ycoord)   ! left neighbor
-            neighbors(4, n) = gridindex(right, ycoord)  ! right neighbor
-            
+            neighbors(n, 1) = gridindex(xcoord, top)    ! top neighbor
+            neighbors(n, 2) = gridindex(xcoord, btm)    ! bottom neighbor
+            neighbors(n, 3) = gridindex(left, ycoord)   ! left neighbor
+            neighbors(n, 4) = gridindex(right, ycoord)  ! right neighbor
+
+            ! Debugging output
+            ! print *, 'Neighbors for point ', n, ': ', neighbors(n, 1), neighbors(n, 2), neighbors(n, 3), neighbors(n, 4)
         end do
-        
     end subroutine find_neighbors
+
 
     ! --------------------------------------------------------------------------
 
@@ -290,57 +297,58 @@ contains
     !  alpha             -- diffusion coefficient (dimensionless)
     !  num_iter          -- number of iterations to execute
     !
-    subroutine apply_diffusion( in_field, out_field, alpha, num_iter )
+    subroutine apply_diffusion(in_field, out_field, alpha, num_iter)
         implicit none
-        
+
         ! arguments
         real (kind=wp), intent(inout) :: in_field(:, :)
         real (kind=wp), intent(inout) :: out_field(:, :)
         real (kind=wp), intent(in) :: alpha
         integer, intent(in) :: num_iter
-        
+
         ! local
         real (kind=wp), save, allocatable :: tmp1_field(:)
         real (kind=wp) :: laplap
         integer :: iter, n, k
-        
+
         ! this is only done the first time this subroutine is called (warmup)
         ! or when the dimensions of the fields change
-        if ( allocated(tmp1_field) .and. &
-            any( shape(tmp1_field) /= (/nPoint/) ) ) then
-            deallocate( tmp1_field )
+        if (allocated(tmp1_field) .and. &
+            any(shape(tmp1_field) /= (/nPoint/))) then
+            deallocate(tmp1_field)
         end if
-        if ( .not. allocated(tmp1_field) ) then
-            allocate( tmp1_field(nPoint) )
+        if (.not. allocated(tmp1_field)) then
+            allocate(tmp1_field(nPoint))
             tmp1_field = 0.0_wp
         end if
-        
-        do iter = 1, num_iter 
-        
+
+        do iter = 1, num_iter
+
             do k = 1, nz
-            
+
                 do n = 1, nPoint
                     tmp1_field(n) = -4._wp * in_field(n, k)        &
-                        + in_field(neighbors(1, n), k) + in_field(neighbors(2, n), k)  &
-                        + in_field(neighbors(3, n), k) + in_field(neighbors(4, n), k)
+                        + in_field(neighbors(n, 1), k) + in_field(neighbors(n, 2), k)  &
+                        + in_field(neighbors(n, 3), k) + in_field(neighbors(n, 4), k)
                 end do
 
                 do n = 1, nPoint
                     laplap = -4._wp * tmp1_field(n)       &
-                        + tmp1_field(neighbors(1, n)) + tmp1_field(neighbors(2, n))  &
-                        + tmp1_field(neighbors(3, n)) + tmp1_field(neighbors(4, n))
-                        
-                    if ( iter == num_iter ) then
+                        + tmp1_field(neighbors(n, 1)) + tmp1_field(neighbors(n, 2))  &
+                        + tmp1_field(neighbors(n, 3)) + tmp1_field(neighbors(n, 4))
+
+                    if (iter == num_iter) then
                         out_field(n, k) = in_field(n, k) - alpha * laplap
                     else
-                        in_field(n, k)  = in_field(n, k) - alpha * laplap
+                        in_field(n, k) = in_field(n, k) - alpha * laplap
                     end if
 
                 end do
             end do
         end do
-            
+
     end subroutine apply_diffusion
+
         
 
     ! initialize at program start
