@@ -7,8 +7,8 @@ Here is the list of Fortran files in the root repository:
 * `stencil2d-sequential.F90`: Based on the base version, we modified the code and implemented new functions to make unstructured grid possible. The name sequential refers to the method to map the unstructured grid, where an index for indirect addressing is given to each grid point row-by-row.
 * `stencil2d-random.F90`: The unstructured grid version of the stencil2d program where the indices are shuffled and assigned to the grid points.
 * `stencil2d-hilbert.F90`: The unstructured grid version of the stencil2d program where the indices are computed using Hilbert curve and assigned to the grid points.
-* `stencil2d-unstructured_i_out.F90`: The unstructured grid version of the sequential stencil2d program where conversion was made column-by-column.
-* `stencil2d-unstructured_j_out.F90`: The unstructured grid version of the sequential stencil2d program where conversion was made row-by-row.
+* `stencil2d-sequential_i_out.F90`: The unstructured grid version of the sequential stencil2d program where conversion was made column-by-column.
+* `stencil2d-sequential_j_out.F90`: The unstructured grid version of the sequential stencil2d program where conversion was made row-by-row.
 * `stencil2d-hilbert_nPoint,4.F90`: Based on the `stencil2d-hilbert.F90`, the dimension of the 2D array `neighbor(4, nPoint)` is changed to `(nPoint, 4)`
 * `stencil2d-random_nPoint,4.F90`: Based on the `stencil2d-random.F90`, the dimension of the 2D array `neighbor(4, nPoint)` is changed to `(nPoint, 4)`
 * `stencil2d-sequential_nPoint,4.F90`: Based on the `stencil2d-sequential.F90`, the dimension of the 2D array `neighbor(4, nPoint)` is changed to `(nPoint, 4)`
