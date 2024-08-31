@@ -1,3 +1,5 @@
+# HPC4WC Group10 Structured vs. Unstructured
+
 The root repository contains the Fortran files (for different versions of the stencil2d program) and the jupyter notebook files (for validating and plotting experiment results). The data and figures folders contain the raw data of different experiments and the figures on the report respectively. 
 
 Here is the list of Fortran files in the root repository:
